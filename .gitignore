@@ -5,6 +5,9 @@ __pycache__/
 
 # MAC users
 .DS_STORE
+
+# Dataset 
+twitter-datasets/
 # C extensions
 *.so
 
