@@ -8,6 +8,7 @@ __pycache__/
 
 # Dataset 
 twitter-datasets/
+data/
 # C extensions
 *.so
 
