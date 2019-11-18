@@ -31,24 +31,25 @@ neg_smiley = ["\)':", "\)':<", "\)';", "\)=", "\)=<", "/':", "/';", "/-:", "/:",
 
 
 # Top word without sentiment meaning nor negative form possible
-stop_words= ["i", "you", "it", "she", "he", "we", "they", "a", "in", "to", "the", "and", "my", "me", "of", "for", "that", "this", "on", "so", "be", "just", "your", "at", "its", "im", ".", ",", ")", "'", "(", "or", "by", "am", "ve", "our", "\"", "<", ">", "&", "\\", ":", "-", ";", "/"]
+#stop_words= ["i", "you", "it", "she", "he", "we", "they", "a", "in", "to", "the", "and", "my", "me", "of", "for", "that", "this", "on", "so", "be", "just", "your", "at", "its", "im", ".", ",", ")", "'", "(", "or", "by", "am", "ve", "our", "\"", "<", ">", "&", "\\", ":", "-", ";", "/"]
+stop_words= [ ".", ",", ")", "'", "(", "\"", "<", ">", "\\", ":", "-", ";", "/", "\""]
 
 
 
-def tokenizeTweet(tweet, stop_words=False, smiley_tag = False, strip_handles=True, reduce_len=True, preserve_case=False):
-    tknzr = TweetTokenizer(strip_handles=strip_handles, reduce_len=reduce_len, preserve_case=preserve_case, ngram=1)
+def tokenizeTweet(tweet, stop_word=False, smiley_tag = False, strip_handles=True, reduce_len=True, preserve_case=False):
+    tknzr = TweetTokenizer(strip_handles=strip_handles, reduce_len=reduce_len, preserve_case=preserve_case)
 
     # Tokenize
     tokens = tknzr.tokenize(tweet)
     
     if smiley_tag:
-        for word in tokens:
+        for i, word in enumerate(tokens):
             if word in pos_smiley:
-                word = '<pos_smiley>'
+                tokens[i] = '<pos_smiley>'
             elif word in neg_smiley:
-                word = '<neg_smiley>'
+                tokens[i] = '<neg_smiley>'
     
-    if stop_words:
+    if stop_word:
         tokens = [word for word in tokens if word not in stop_words and not word.isnumeric()]
 
     return tokens
@@ -60,10 +61,10 @@ def computeBigrams(tweetsTokenized):
     return [bigram[tweet] for tweet in tweetsTokenized]
 
 
-def getWord2VecDict(tokensList=None, size=200, window=10, min_count=2, workers=10, iters=10, train=False):
+def getWord2VecDict(tokensList=None, size=200, window=10, min_count=2, workers=10, iters=10, train=True):
     filename = "KeyedW2V_size" + str(size) + "_window" + str(window) + "_min_count" + str(min_count) + "_workers" + str(workers) + "_iter" + str(iters) + ".kv"
 
-    if os.path.isfile(filename):
+    if os.path.isfile(filename) and not train:
         return KeyedVectors.load(filename, mmap='r')
     else:
         print("You haven't train Word2Vec already with those parameters, it can take some time...")
@@ -85,10 +86,10 @@ def getWord2VecDict(tokensList=None, size=200, window=10, min_count=2, workers=1
     return None
 
 
-def getFasttextDict(tokensList=None, size=200, window=10, min_count=2, workers=10, iters=10):
+def getFasttextDict(tokensList=None, size=200, window=10, min_count=2, workers=10, iters=10, train=False):
     filename = "KeyedFT_size" + str(size) + "_window" + str(window) + "_min_count" + str(min_count) + "_workers" + str(workers) + "_iter" + str(iters) + ".kv"
 
-    if os.path.isfile(filename):
+    if os.path.isfile(filename) and not train:
         return KeyedVectors.load(filename, mmap='r')
     else:
         print("You haven't train Word2Vec already with those parameters, it can take some time...")
