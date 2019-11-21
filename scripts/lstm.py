@@ -2,13 +2,14 @@ from keras.models import Sequential, load_model
 from keras.layers import Dense, Dropout, Activation, GRU
 from keras.layers import Embedding
 from keras.initializers import Constant
-from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau, Tensorboard
+from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
 from keras.layers import LSTM
 from keras.preprocessing.sequence import pad_sequences
 from keras.preprocessing.text import Tokenizer
 from gensim.models import Word2Vec
 from keras.initializers import Constant
-from keras.layers import Dense, Dropout, Activation, GRU
+from keras.layers import Dense, Dropout, Activation, GRU, Bidirectional
+import tensorflow as tf
 from tools import *
 
 class LSTM_Model:
@@ -61,7 +62,7 @@ class LSTM_Model:
                 logdir = 'logs/gru'
             else:
                 logdir = 'logs/blstm'
-            tensorboard_callback = TensorBoard(log_dir=logdir, histogram_freq=1)
+            tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=logdir, histogram_freq=1)
             callbacks.append(tensorboard_callback)
         
         print (self.model.summary())
