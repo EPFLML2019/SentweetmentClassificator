@@ -1,14 +1,12 @@
-from keras.models import Sequential, load_model
-from keras.layers import Dense, Dropout, Activation, GRU
-from keras.layers import Embedding
-from keras.initializers import Constant
-from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
-from keras.layers import LSTM
-from keras.preprocessing.sequence import pad_sequences
-from keras.preprocessing.text import Tokenizer
+import tensorflow as tf
+from tensorflow.keras.models import Sequential, load_model
+from tensorflow.keras.initializers import Constant
+from tensorflow.keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+from tensorflow.keras.preprocessing.text import Tokenizer
 from gensim.models import Word2Vec
-from keras.initializers import Constant
-from keras.layers import Dense, Dropout, Activation, GRU, Bidirectional
+from tensorflow.keras.initializers import Constant
+from tensorflow.keras.layers import Embedding, Dense, Dropout, Activation, GRU, LSTM, Bidirectional, Flatten, GlobalMaxPool1D
 import tensorflow as tf
 from tools import *
 
@@ -46,11 +44,13 @@ class LSTM_Model:
         if self.use_gru:
             self.model.add(GRU(128))
         else:
-            self.model.add(Bidirectional(LSTM(128, return_sequences=True)))
+            self.model.add(Bidirectional(LSTM(64, return_sequences=True)))
             
-        self.model.add(Dense(64))
+        #self.model.add(GlobalMaxPool1D()) #Or at the same place as Flatten()
+        self.model.add(Dense(32))
         self.model.add(Dropout(0.5))
         self.model.add(Activation('relu'))
+        self.model.add(Flatten())
         self.model.add(Dense(1))
         self.model.add(Activation('sigmoid'))
         self.model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
