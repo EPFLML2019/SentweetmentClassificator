@@ -2,7 +2,7 @@ from keras.models import Sequential, load_model
 from keras.layers import Dense, Dropout, Activation, GRU
 from keras.layers import Embedding
 from keras.initializers import Constant
-from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
+from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau, Tensorboard
 from keras.layers import LSTM
 from keras.preprocessing.sequence import pad_sequences
 from keras.preprocessing.text import Tokenizer
@@ -12,13 +12,16 @@ from keras.layers import Dense, Dropout, Activation, GRU
 from tools import *
 
 class LSTM_Model:
-    def __init__(self, tweetsTokenized):
+    def __init__(self, tweetsTokenized, use_gru = False, tensorboard=False):
         self.tokenizer_obj = Tokenizer()
         self.tokenizer_obj.fit_on_texts(tweetsTokenized)
 
         # Compute the maximum number of words in test tweets
         self.max_length = max([len(tweet_tokens) for tweet_tokens in tweetsTokenized])
         self.model = None
+        
+        self.use_gru = use_gru
+        self.tensorboard = tensorboard
 
     def train_model(self, tweetsTokenized, labels, embedding_vectors, batch_size=128, epochs=5):
         # Transform each unique word in unique int identifier
@@ -38,8 +41,12 @@ class LSTM_Model:
         # Add dropout to prevent overfitting
         self.model.add(Dropout(0.4))
 
-        # Add LSTM layer 
-        self.model.add(LSTM(128))
+        # Add LSTM or GRU layer
+        if self.use_gru:
+            self.model.add(GRU(128))
+        else:
+            self.model.add(Bidirectional(LSTM(128, return_sequences=True)))
+            
         self.model.add(Dense(64))
         self.model.add(Dropout(0.5))
         self.model.add(Activation('relu'))
@@ -47,10 +54,20 @@ class LSTM_Model:
         self.model.add(Activation('sigmoid'))
         self.model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
         reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=2, min_lr=0.000001)
+        
+        callbacks = [reduce_lr]
+        if self.tensorboard:
+            if self.use_gru:
+                logdir = 'logs/gru'
+            else:
+                logdir = 'logs/blstm'
+            tensorboard_callback = TensorBoard(log_dir=logdir, histogram_freq=1)
+            callbacks.append(tensorboard_callback)
+        
         print (self.model.summary())
 
         # Train the model
-        self.model.fit(tweet_padded, labels, batch_size=batch_size, epochs=epochs, validation_split=0.1, shuffle=True, callbacks=[reduce_lr])
+        self.model.fit(tweet_padded, labels, batch_size=batch_size, epochs=epochs, validation_split=0.1, shuffle=True, callbacks=callbacks)
 
     def predict(self, tweetsTokenized):
         sequences = self.tokenizer_obj.texts_to_sequences(tweetsTokenized)
