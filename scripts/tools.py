@@ -17,7 +17,7 @@ def create_csv_submission(ids, y_pred, name):
             
 def load_csv_test_data(data_path, sub_sample=False, has_ID=False):
 
-    raw = open(data_path, 'r').readlines()
+    raw = open(data_path, 'r', encoding="utf8").readlines()
     ids = np.zeros(len(raw))
     data = np.array(["" for _ in range(len(raw))], dtype='object')
     i = 0
