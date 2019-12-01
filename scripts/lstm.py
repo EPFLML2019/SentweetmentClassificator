@@ -31,7 +31,7 @@ class LSTM_Model:
         self.model = Sequential()
 
         # Add the embedding layer with our trained embedding matrix
-        embedding_layer = Embedding(input_dim=embedding_vectors.syn0.shape[0], output_dim=embedding_vectors.syn0.shape[1], weights=[embedding_vectors.syn0], 
+        embedding_layer = Embedding(input_dim=embedding_vectors.syn0.shape[0] , output_dim=embedding_vectors.syn0.shape[1], weights=[embedding_vectors.syn0], 
                                 input_length=tweet_padded.shape[1])
         self.model.add(embedding_layer)
 
