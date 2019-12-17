@@ -22,7 +22,7 @@ class LSTM_Model:
         self.use_gru = use_gru
         self.tensorboard = tensorboard
 
-    def train_model(self, tweetsTokenized, labels, embedding_vectors, batch_size=128, epochs=5):
+    def train_model(self, tweetsTokenized, labels, embedding_vectors, batch_size=128, epochs=5, dropout_embedding=0.4, dropout_relu=0.5):
         # Transform each unique word in unique int identifier
         sequences = self.tokenizer_obj.texts_to_sequences(tweetsTokenized)
 
@@ -38,7 +38,7 @@ class LSTM_Model:
         self.model.add(embedding_layer)
 
         # Add dropout to prevent overfitting
-        self.model.add(Dropout(0.4))
+        self.model.add(Dropout(dropout_embedding))
 
         # Add LSTM or GRU layer
         if self.use_gru:
@@ -48,7 +48,7 @@ class LSTM_Model:
             
         #self.model.add(GlobalMaxPool1D()) #Or at the same place as Flatten()
         self.model.add(Dense(32))
-        self.model.add(Dropout(0.5))
+        self.model.add(Dropout(dropout_relu))
         self.model.add(Activation('relu'))
         self.model.add(Flatten())
         self.model.add(Dense(1))
@@ -59,9 +59,9 @@ class LSTM_Model:
         callbacks = [reduce_lr]
         if self.tensorboard:
             if self.use_gru:
-                logdir = 'logs/gru'
+                logdir = 'logs/gru_dropout_embedding=' + str(dropout_embedding) + "_dropout_relu="+dropout_relu+"_batch_size="+batch_size+"_epochs="+str(epochs)
             else:
-                logdir = 'logs/blstm'
+                logdir = 'logs/blstm_dropout_embedding=' + str(dropout_embedding) + "_dropout_relu="+str(dropout_relu)+"_batch_size="+str(batch_size)+"_epochs="+str(epochs)
             tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=logdir, histogram_freq=1)
             callbacks.append(tensorboard_callback)
         
