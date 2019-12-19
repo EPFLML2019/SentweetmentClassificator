@@ -27,9 +27,8 @@ import os
 GLOVE_PATH = "GloVe-1.2/build/"
 
 def getWord2VecDict(tokensList=None, size=200, window=10, min_count=2, workers=10, iters=10):
-     """ Return a dictionnary of embeddings for the word in tokensList using word2vec algorithm """
-
-    filename = "KeyedW2V_size" + str(size) + "_window" + str(window) + "_min_count" + str(min_count) + "_workers" + str(workers) + "_iter" + str(iters) + ".kv"
+    """ Return a dictionnary of embeddings for the word in tokensList using word2vec algorithm """
+    filename = "KeyedW2V_size" + str(size) + "_window" + str(window) + "_min_count" + str(min_count) + "_workers" + str(workers) + "_iter" + str(iters) + '.kv'
 
     if os.path.isfile(filename):
         return KeyedVectors.load(filename, mmap='r')
@@ -38,13 +37,7 @@ def getWord2VecDict(tokensList=None, size=200, window=10, min_count=2, workers=1
         if tokensList is None: 
             print("Please provide a tokensList in order to train the model")
         else:
-            model = models.Word2Vec(
-            tokensList,
-            size=size,
-            window=window,
-            min_count=min_count,
-            workers=workers,
-            iter=iters)
+            model = models.Word2Vec(tokensList, size=size, window=window, min_count=min_count, workers=workers, iter=iters)
 
             kw = model.wv
             kw.save(filename)
@@ -56,7 +49,7 @@ def getWord2VecDict(tokensList=None, size=200, window=10, min_count=2, workers=1
 def getFasttextDict(tokensList=None, size=200, window=10, min_count=2, workers=10, iters=10):
     """ Return a dictionnary of embeddings for the word in tokensList using FastText algorithm """
 
-    filename = "KeyedFT_size" + str(size) + "_window" + str(window) + "_min_count" + str(min_count) + "_workers" + str(workers) + "_iter" + str(iters) + ".kv"
+    filename = "KeyedFT_size" + str(size) + "_window" + str(window) + "_min_count" + str(min_count) + "_workers" + str(workers) + "_iter" + str(iters) + '.kv'
 
     if os.path.isfile(filename):
         return KeyedVectors.load(filename, mmap='r')
@@ -132,16 +125,16 @@ def getGloveDict(tokensList=None, size=100, window=10, min_count=10, workers=16,
 
 def generateTweetFeatures(word_dic, words):
     """ Generate features for a tweet by averaging their word embedding """
-        num_words = len(words)
-        if num_words < 1:
-            num_words = 1
-            
-        vector = np.zeros(word_dic.vector_size)
-        for word in words:
-            if word in word_dic.vocab:
-                vector += word_dic[word]
-        vector /= num_words
-        return vector
+    num_words = len(words)
+    if num_words < 1:
+        num_words = 1
+        
+    vector = np.zeros(word_dic.vector_size)
+    for word in words:
+        if word in word_dic.vocab:
+            vector += word_dic[word]
+    vector /= num_words
+    return vector
 
 def generateTweetsFeatures(tweetsTokenized, kv):
     """ Generate features for a collection of tweet by averaging their word embedding """

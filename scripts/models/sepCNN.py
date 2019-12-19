@@ -4,7 +4,7 @@
 ### Authors: Arthur Passuello, Lucas Strauss, Francois Quellec ###
 ##################################################################
 
-from tools import *
+from preprocessing.tools import *
 
 import tensorflow as tf
 from tensorflow.keras.models import Sequential, load_model
@@ -20,7 +20,7 @@ from tensorflow.python.keras.layers import GlobalAveragePooling1D
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from tensorflow.keras.layers import Embedding, Dense, Dropout, Activation, GRU, LSTM, Bidirectional, Flatten, GlobalMaxPool1D
-from bigrams import bigramGenerator
+from preprocessing.bigrams import bigramGenerator
 
 class sepCNN_Model:
   """sepCNN_Model"""

@@ -7,8 +7,8 @@
 from gensim.models.phrases import Phrases, Phraser
 import numpy as np
 import csv
-from tools import load_csv_test_data
-from tokenizer import tokenize
+from preprocessing.tools import load_csv_test_data
+from preprocessing.tokenizer import tokenize
 import pandas as pd
 import sys
 import ntpath
