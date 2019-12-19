@@ -1,16 +1,16 @@
 test_size=0.1
 train_size=0.1
 DIM = 50
-BIGRAM = True
+BIGRAM = False
 
 
-from embeddings import *
-from tools import *
+from preprocessing.embeddings import *
+from preprocessing.tools import *
 import pandas as pd
 import numpy as np
 from nltk.tokenize import TweetTokenizer
 import os.path
-from tokenizer import *
+from preprocessing.tokenizer import *
 
 # Load library
 from nltk.corpus import stopwords
@@ -70,12 +70,13 @@ labels[labels<0] = 0
 X_train, X_test, y_train, y_test = train_test_split(all_tokens, labels, test_size=test_size, train_size=train_size, random_state=1)
 
 
-use_tensorboard = True
+use_tensorboard = False
 
 #######################################
 ####		     sep-CNN		   ####
 #######################################
-from sepCNN import *
+from models.sepCNN import *
+print('Training with sepCNN')
 model= sepCNN_Model(all_tokens, wv, tensorboard=True, useBigrams=BIGRAM)
 model.train_model(X_train, y_train, wv, batch_size=128, epochs=5)
 model.save("sepCnn_bigram")
@@ -91,7 +92,8 @@ model.save("sepCnn_bigram")
 #######################################
 
 
-from lstm import *
+from models.lstm import *
+print('Training with BLSTM')
 model= LSTM_Model(all_tokens, wv, use_gru=False, tensorboard=False, useBigrams=BIGRAM)
 model.train_model(X_train, y_train, wv, batch_size=128, epochs=5)
 model.save("blstm_bigram")
@@ -107,6 +109,7 @@ model.save("blstm_bigram")
 #######################################
 
 # Convert tweet in features with previous embedding system
+print('Training with SVM')
 X_train, X_test, y_train, y_test = train_test_split(all_tokens, full_labels, test_size=test_size, train_size=train_size, random_state=1)
 X_train_svm = generateTweetsFeatures(X_train, wv)
 X_test_svm = generateTweetsFeatures(X_test, wv)
