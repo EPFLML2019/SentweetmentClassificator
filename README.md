@@ -10,7 +10,7 @@ To run our project the following libraries are required:
 - `pickle`
 - `sklearn`
 
-You also need the GloVe dataset from https://nlp.stanford.edu/projects/glove/. Please download the twitter dataset and extract the archive in the `script` folder
+You also need the GloVe dataset from https://nlp.stanford.edu/projects/glove/. Please download the code `GloVe-1.2.zip` extract the archive in the `script` folder and run the command `make` inside the `GloVe-1.2` folder.
 
 By running the file `run.py` you should see the tweets being imported, pre-processed then used to train our model. Finally the prediction should come out in the file `predictions_out.csv`.
 
