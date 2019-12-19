@@ -40,6 +40,7 @@ def generateFinalPredictions():
 	print("Done")
 
 	print("Building Model: ", end="")
+	full_labels[full_labels <0] = 0
 	model= sepCNN_Model(all_tokens, wv, tensorboard=False, useBigrams=False)
 	print("Done")
 

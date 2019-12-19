@@ -15,8 +15,8 @@ from gensim.models import Word2Vec
 from tensorflow.keras.initializers import Constant
 from tensorflow.keras.layers import Embedding, Dense, Dropout, Activation, GRU, LSTM, Bidirectional, Flatten, GlobalMaxPool1D
 import tensorflow as tf
-from tools import *
-from bigrams import bigramGenerator
+from preprocessing.tools import *
+from preprocessing.bigrams import bigramGenerator
 
 class BLSTM_Model:
     def __init__(self, tweetsTokenized, embedding_vectors, use_gru = False, tensorboard=False, useBigrams=False):

@@ -26,9 +26,9 @@ class sepCNN_Model:
   """sepCNN_Model"""
   def __init__(self, tweetsTokenized, embedding_vectors, tensorboard=False, useBigrams=False):
     self.embedding_vectors = embedding_vectors
+    self.useBigrams = useBigrams
 
     # Generate Bigrams if needed
-    self.useBigrams = useBigrams
     if useBigrams:
       self.bigram = bigramGenerator(tweetsTokenized)
       tweetsTokenized = [self.bigram[tweet] for tweet in tweetsTokenized]
@@ -50,7 +50,8 @@ class sepCNN_Model:
     # Generate Bigrams if needed
     if self.useBigrams:
       tweetsTokenized = [self.bigram[tweet] for tweet in tweetsTokenized]
-
+      self.max_length = max([len(tweet_tokens) for tweet_tokens in tweetsTokenized])
+      
     # Remove unknown words
     tweetsTokenized = [list(filter(lambda i: i in embedding_vectors, tweet)) for tweet in tweetsTokenized]
 
