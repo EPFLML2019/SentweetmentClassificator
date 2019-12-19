@@ -1,6 +1,7 @@
 test_size=0.1
 train_size=0.1
 DIM = 50
+BIGRAM = True
 
 
 from embeddings import *
@@ -44,14 +45,16 @@ with open(TOKENS_PATH, 'rb') as f:
 
 
 # Generate bigrams
-all_tokens = computeBigrams(all_tokens)
+#all_tokens = computeBigrams(all_tokens)
 
 from gensim.test.utils import datapath
 from gensim.test.utils import datapath, get_tmpfile
 from gensim.models import KeyedVectors
 from gensim.scripts.glove2word2vec import glove2word2vec
-
-glove_file = '../data/self_trained_gloves/vectors_d'+str(DIM)+'.txt'
+if BIGRAM:
+	glove_file = '../data/self_trained_gloves/vectors_bigram_d'+str(DIM)+'.txt'
+else:	
+	glove_file = '../data/self_trained_gloves/vectors_d'+str(DIM)+'.txt'
 tmp_file = get_tmpfile("test_word2vec.txt")
 
 _ = glove2word2vec(glove_file, tmp_file)
@@ -61,11 +64,10 @@ wv = KeyedVectors.load_word2vec_format(tmp_file)
 # Normalize 
 wv.init_sims(replace=True)
 
-all_tokens_filtered = [list(filter(lambda i: i in wv, tweet)) for tweet in all_tokens]
 labels = full_labels
 labels[labels<0] = 0
 
-X_train, X_test, y_train, y_test = train_test_split(all_tokens_filtered, labels, test_size=test_size, train_size=train_size, random_state=1)
+X_train, X_test, y_train, y_test = train_test_split(all_tokens, labels, test_size=test_size, train_size=train_size, random_state=1)
 
 
 use_tensorboard = True
@@ -74,9 +76,9 @@ use_tensorboard = True
 ####		     sep-CNN		   ####
 #######################################
 from sepCNN import *
-model= sepCNN_Model(all_tokens_filtered, tensorboard=True)
+model= sepCNN_Model(all_tokens, wv, tensorboard=True, useBigrams=BIGRAM)
 model.train_model(X_train, y_train, wv, batch_size=128, epochs=5)
-
+model.save("sepCnn_bigram")
 # Test the model
 predictions = model.predict(X_test)
 predictions[predictions<0] = 0
@@ -90,9 +92,9 @@ model.save("sepCnn_bigram")
 
 
 from lstm import *
-model= LSTM_Model(all_tokens_filtered, use_gru=False, tensorboard=False)
+model= LSTM_Model(all_tokens, wv, use_gru=False, tensorboard=False, useBigrams=BIGRAM)
 model.train_model(X_train, y_train, wv, batch_size=128, epochs=5)
-
+model.save("blstm_bigram")
 # Test the model
 predictions = model.predict(X_test)
 predictions[predictions<0] = 0

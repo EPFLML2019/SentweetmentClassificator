@@ -15,52 +15,6 @@ import re
 import os.path
 from gensim.models.phrases import Phrases, Phraser
 
-
-# Top pos smiley used and not removed
-pos_smiley = ["\(':", "\(':<", "\(';", "\(\*:", "\(\*;", "\(:", "\(;", "\(=", ":'\)", ":'\]", ":'\}", 
-              ":\)", ":\*\)", ":\*:", ":-\]", ":-\}", ":\]", ":\}", ";'\)", ";'\]", ";\)", ";\*\)", ";-\}"
-             , ";\]", ";\}", "=\)", "\(=", "<3", ":p", ":D", "xD", ":)"]
-
-
-# Top neg smiley used and not removed
-neg_smiley = ["\)':", "\)':<", "\)';", "\)=", "\)=<", "/':", "/';", "/-:", "/:", "/:<", "/;", 
-              "/;<", "/=", ":'/", ":'@", ":'\[", ":'\\", ":'\{", ":'\|", ":\(", ":\*\(", ":\*\{", 
-            ":\*\|", ":-/", ":-@", ":-\[", ":-\\", ":-\|", ":/", ":@", ":\[", ":\\", ":\{", ":\|"
-             , ";'\(", ";'/", ";'\[", ";\*\{", ";-/", ";-\|", ";/", ";@", ";\[", ";\\", ";\{", ";\|"
-             ,"=\(", "</3"]
-
-
-# Top word without sentiment meaning nor negative form possible
-#stop_words= ["i", "you", "it", "she", "he", "we", "they", "a", "in", "to", "the", "and", "my", "me", "of", "for", "that", "this", "on", "so", "be", "just", "your", "at", "its", "im", ".", ",", ")", "'", "(", "or", "by", "am", "ve", "our", "\"", "<", ">", "&", "\\", ":", "-", ";", "/"]
-stop_words= [ ".", ",", ")", "'", "(", "\"", "<", ">", "\\", ":", "-", ";", "/", "\""]
-
-
-
-def tokenizeTweet(tweet, stop_word=False, smiley_tag = False, strip_handles=True, reduce_len=True, preserve_case=False):
-    tknzr = TweetTokenizer(strip_handles=strip_handles, reduce_len=reduce_len, preserve_case=preserve_case)
-
-    # Tokenize
-    tokens = tknzr.tokenize(tweet)
-    
-    if smiley_tag:
-        for i, word in enumerate(tokens):
-            if word in pos_smiley:
-                tokens[i] = '<pos_smiley>'
-            elif word in neg_smiley:
-                tokens[i] = '<neg_smiley>'
-    
-    if stop_word:
-        tokens = [word for word in tokens if word not in stop_words and not word.isnumeric()]
-
-    return tokens
-
-def computeBigrams(tweetsTokenized):
-    phrases = Phrases(tweetsTokenized)
-    bigram = Phraser(phrases)
-
-    return [bigram[tweet] for tweet in tweetsTokenized]
-
-
 def getWord2VecDict(tokensList=None, size=200, window=10, min_count=2, workers=10, iters=10, train=True):
     filename = "KeyedW2V_size" + str(size) + "_window" + str(window) + "_min_count" + str(min_count) + "_workers" + str(workers) + "_iter" + str(iters) + ".kv"
 

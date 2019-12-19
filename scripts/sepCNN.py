@@ -14,11 +14,19 @@ from tensorflow.python.keras.layers import GlobalAveragePooling1D
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from tensorflow.keras.layers import Embedding, Dense, Dropout, Activation, GRU, LSTM, Bidirectional, Flatten, GlobalMaxPool1D
-
+from bigrams import bigramGenerator
 
 class sepCNN_Model:
   """docstring for sepCNN_Model"""
-  def __init__(self, tweetsTokenized, tensorboard=False):
+  def __init__(self, tweetsTokenized, embedding_vectors, tensorboard=False, useBigrams=False):
+    self.embedding_vectors = embedding_vectors
+
+    self.useBigrams = useBigrams
+    if useBigrams:
+      self.bigram = bigramGenerator(tweetsTokenized)
+      tweetsTokenized = [self.bigram[tweet] for tweet in tweetsTokenized]
+      tweetsTokenized = [list(filter(lambda i: i in embedding_vectors, tweet)) for tweet in tweetsTokenized]
+
     self.tokenizer_obj = Tokenizer()
     self.tokenizer_obj.fit_on_texts(tweetsTokenized)
 
@@ -29,6 +37,13 @@ class sepCNN_Model:
 
   def train_model(self, tweetsTokenized, labels, embedding_vectors, batch_size=128, 
                 epochs=5, dropout_rate=0.2, filters = 64, kernel_size= 7, pool_size=7, learning_rate=1e-3):
+
+    if self.useBigrams:
+      tweetsTokenized = [self.bigram[tweet] for tweet in tweetsTokenized]
+
+
+    tweetsTokenized = [list(filter(lambda i: i in embedding_vectors, tweet)) for tweet in tweetsTokenized]
+
     # Transform each unique word in unique int identifier
     sequences = self.tokenizer_obj.texts_to_sequences(tweetsTokenized)
 
@@ -98,6 +113,8 @@ class sepCNN_Model:
     if self.model is None:
       print("Please train the model first")
     else:
+      if self.useBigrams:
+        tweetsTokenized = [self.bigram[tweet] for tweet in tweetsTokenized]
       sequences = self.tokenizer_obj.texts_to_sequences(tweetsTokenized)
       tweet_pad = pad_sequences(sequences, maxlen=self.max_length)
 

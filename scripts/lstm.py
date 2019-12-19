@@ -9,9 +9,17 @@ from tensorflow.keras.initializers import Constant
 from tensorflow.keras.layers import Embedding, Dense, Dropout, Activation, GRU, LSTM, Bidirectional, Flatten, GlobalMaxPool1D
 import tensorflow as tf
 from tools import *
+from bigrams import bigramGenerator
 
 class LSTM_Model:
-    def __init__(self, tweetsTokenized, use_gru = False, tensorboard=False):
+    def __init__(self, tweetsTokenized, embedding_vectors, use_gru = False, tensorboard=False, useBigrams=False):
+        self.embedding_vectors = embedding_vectors
+        self.useBigrams = useBigrams
+        if self.useBigrams:
+            self.bigram = bigramGenerator(tweetsTokenized)
+            tweetsTokenized = [self.bigram[tweet] for tweet in tweetsTokenized]
+            tweetsTokenized = [list(filter(lambda i: i in embedding_vectors, tweet)) for tweet in tweetsTokenized]
+
         self.tokenizer_obj = Tokenizer()
         self.tokenizer_obj.fit_on_texts(tweetsTokenized)
 
@@ -22,7 +30,15 @@ class LSTM_Model:
         self.use_gru = use_gru
         self.tensorboard = tensorboard
 
+        
+
     def train_model(self, tweetsTokenized, labels, embedding_vectors, batch_size=128, epochs=5, dropout_embedding=0.4, dropout_relu=0.5):
+        if self.useBigrams:
+            tweetsTokenized = [self.bigram[tweet] for tweet in tweetsTokenized]
+            self.max_length = max([len(tweet_tokens) for tweet_tokens in tweetsTokenized])
+
+        tweetsTokenized = [list(filter(lambda i: i in embedding_vectors, tweet)) for tweet in tweetsTokenized]
+
         # Transform each unique word in unique int identifier
         sequences = self.tokenizer_obj.texts_to_sequences(tweetsTokenized)
 
@@ -71,6 +87,9 @@ class LSTM_Model:
         self.model.fit(tweet_padded, labels, batch_size=batch_size, epochs=epochs, validation_split=0.1, shuffle=True, callbacks=callbacks)
 
     def predict(self, tweetsTokenized):
+        if self.useBigrams:
+            tweetsTokenized = [self.bigram[tweet] for tweet in tweetsTokenized]         
+
         sequences = self.tokenizer_obj.texts_to_sequences(tweetsTokenized)
         tweet_pad = pad_sequences(sequences, maxlen=self.max_length)
 

@@ -66,5 +66,5 @@ if __name__ == '__main__':
         with open(filename) as fp:
             for cnt, line in enumerate(fp):
                 tokens = tokenize(line, string=True)
-                output.write(tokens + "\n")
+                output.write(tokens + " \n")
     print ("DONE!")
